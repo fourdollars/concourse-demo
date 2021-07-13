@@ -1,0 +1,38 @@
+resource_types:
+- name: webdav
+  type: registry-image
+  source:
+    repository: ghcr.io/fourdollars/webdav-resource
+  defaults:
+    domain: webdav
+    username: webdav
+    password: webdav
+    ssl: false
+resources:
+- name: demo-storage
+  type: webdav
+  icon: nas
+  source:
+    path: demo
+- name: ubuntu-focal
+  type: registry-image
+  icon: ubuntu
+  source:
+    repository: ubuntu
+    tag: focal
+jobs:
+- name: check-demo-message
+  plan:
+  - get: ubuntu-focal
+  - get: demo-storage
+    trigger: true
+  - task: check-message
+    image: ubuntu-focal
+    config:
+      platform: linux
+      inputs:
+      - name: demo-storage
+      run:
+        path: cat
+        args:
+        - demo-storage/msg.log
