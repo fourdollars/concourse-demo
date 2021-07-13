@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Bash strict mode
+set -euo pipefail
+IFS=$'\n\t'
+
+# make stdout available as fd 3 for the result
+exec 3>&1
+# redirect all output to stderr for logging
+exec 1>&2
+
+# read source json from /dev/stdin and save to /tmp/input.json
+jq -M -S . < /dev/stdin > /tmp/input.json
+# '-M' monochrome (don't colorize JSON);
+# '-S' sort keys of objects on output;
+
+case "$0" in
+    ('/opt/resource/check')
+        json='[]'
+        ;;
+    ('/opt/resource/in')
+        cd "$1" # /tmp/build/get
+        json='{}'
+        ;;
+    ('/opt/resource/out')
+        cd "$1" # /tmp/build/put
+        json='{}'
+        ;;
+esac
+
+# output the json to fd 3
+jq -n "$json" >&3
+# '-n' Don't read from stdin
