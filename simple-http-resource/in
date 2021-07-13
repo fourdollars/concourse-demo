@@ -9,22 +9,62 @@ exec 3>&1
 # redirect all output to stderr for logging
 exec 1>&2
 
-# read source json from /dev/stdin and save to /tmp/input.json
+# read the json from /dev/stdin and save to /tmp/input.json
 jq -M -S . < /dev/stdin > /tmp/input.json
 # '-M' monochrome (don't colorize JSON);
 # '-S' sort keys of objects on output;
 
+url=$(jq -r .source.url < /tmp/input.json)
+
 case "$0" in
     ('/opt/resource/check')
-        json='[]'
+        sha256=$(curl --head "$url" \
+            | grep -e ^Last-Modified -e ^Content-Length \
+            | sha256sum | awk '{print $1}')
+        json=$(cat <<ENDLINE
+[
+  {
+    "digest": "sha256:$sha256"
+  }
+]
+ENDLINE
+)
         ;;
     ('/opt/resource/in')
         cd "$1" # /tmp/build/get
-        json='{}'
+        curl --dump-header /tmp/header.log "$url" > "$(basename "$url")"
+        sha256=$(grep -e ^Last-Modified -e ^Content-Length /tmp/header.log \
+            | sha256sum | awk '{print $1}')
+        length=$(grep -e ^Content-Length /tmp/header.log \
+            | awk '{print $1}')
+        modified=$(grep -e ^Last-Modified /tmp/header.log \
+            | cut -d ' ' -f 2-)
+        json=$(cat <<ENDLINE
+{
+  "version": {
+    "digest": "sha256:$sha256"
+  },
+  "metadata": [
+    {
+      "name": "url",
+      "value": "$url"
+    },
+    {
+      "name": "Last-Modified",
+      "value": "$modified"
+    },
+    {
+      "name": "Content-Length",
+      "value": "$length"
+    }
+  [
+}
+ENDLINE
+)
         ;;
     ('/opt/resource/out')
         cd "$1" # /tmp/build/put
-        json='{}'
+        json='{}' # noop
         ;;
 esac
 
