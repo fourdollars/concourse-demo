@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: concourse_pass
 
   web:
-    image: concourse/concourse:7.2.0
+    image: concourse/concourse:7.3.2
     command: web
     links: [db]
     depends_on: [db]
@@ -39,7 +39,7 @@ services:
       CONCOURSE_PROMETHEUS_BIND_PORT: 8081
 
   worker:
-    image: concourse/concourse
+    image: concourse/concourse:7.3.2
     command: worker
     privileged: true
     depends_on: [web]
@@ -70,3 +70,18 @@ services:
       REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
     volumes:
       - ./registry:/auth
+
+  webdav:
+    image: ghcr.io/fourdollars/webdav-docker
+    environment:
+      USERNAME: webdav
+      PASSWORD: webdav
+      AUTH_TYPE: Digest
+    restart: unless-stopped
+    volumes:
+      - ./webdav:/var/lib/dav
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
