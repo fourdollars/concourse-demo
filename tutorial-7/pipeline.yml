@@ -1,23 +1,23 @@
 ---
 resources:
-  - name: resource-git
+  - name: concourse-demo
     type: git
     source:
-      uri: https://github.com/fourdollars/mattermost-notification-resource.git
-      branch: main
+      uri: https://github.com/fourdollars/concourse-demo.git
+      branch: coscup
   - name: resource-image
     type: docker-image
     source:
-      repository: registry:5000/mattermost-notification-resource
+      repository: registry:5000/simple-http-resource
       username: registry
       password: registry
       insecure_registries: [ "registry:5000" ]
 
 jobs:
-  - name: build-mattermost-notification-resource
+  - name: build-simple-http-resource
     plan:
-      - get: resource-git
+      - get: concourse-demo
         trigger: true
       - put: resource-image
         params:
-          build: resource-git
+          build: concourse-demo/simple-http-resource
