@@ -36,9 +36,9 @@ ENDLINE
         sha256=$(grep -i -e ^Last-Modified -e ^Content-Length /tmp/header.log \
             | sha256sum | awk '{print $1}')
         length=$(grep -i -e ^Content-Length /tmp/header.log \
-            | awk '{print $1}')
+            | awk '{print $2}' | tr -d '\r')
         modified=$(grep -i -e ^Last-Modified /tmp/header.log \
-            | cut -d ' ' -f 2-)
+            | cut -d ' ' -f 2- | tr -d '\r')
         json=$(cat <<ENDLINE
 {
   "version": {
@@ -57,7 +57,7 @@ ENDLINE
       "name": "Content-Length",
       "value": "$length"
     }
-  [
+  ]
 }
 ENDLINE
 )
