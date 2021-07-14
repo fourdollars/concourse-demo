@@ -19,7 +19,7 @@ url=$(jq -r .source.url < /tmp/input.json)
 case "$0" in
     ('/opt/resource/check')
         sha256=$(curl --head "$url" \
-            | grep -e ^Last-Modified -e ^Content-Length \
+            | grep -i -e ^Last-Modified -e ^Content-Length \
             | sha256sum | awk '{print $1}')
         json=$(cat <<ENDLINE
 [
@@ -33,11 +33,11 @@ ENDLINE
     ('/opt/resource/in')
         cd "$1" # /tmp/build/get
         curl --dump-header /tmp/header.log "$url" > "$(basename "$url")"
-        sha256=$(grep -e ^Last-Modified -e ^Content-Length /tmp/header.log \
+        sha256=$(grep -i -e ^Last-Modified -e ^Content-Length /tmp/header.log \
             | sha256sum | awk '{print $1}')
-        length=$(grep -e ^Content-Length /tmp/header.log \
+        length=$(grep -i -e ^Content-Length /tmp/header.log \
             | awk '{print $1}')
-        modified=$(grep -e ^Last-Modified /tmp/header.log \
+        modified=$(grep -i -e ^Last-Modified /tmp/header.log \
             | cut -d ' ' -f 2-)
         json=$(cat <<ENDLINE
 {

@@ -1,0 +1,38 @@
+resource_types:
+- name: simple-http
+  type: docker-image
+  source:
+    repository: registry:5000/simple-http-resource
+    username: registry
+    password: registry
+    insecure_registries: [ "registry:5000" ]
+
+resources:
+- name: message
+  icon: nas
+  type: simple-http
+  source:
+    url: https://people.debian.org/~fourdollars/coscup-2021.log
+- name: ubuntu-focal
+  type: registry-image
+  icon: ubuntu
+  source:
+    repository: ubuntu
+    tag: focal
+
+jobs:
+- name: check-message
+  plan:
+  - get: ubuntu-focal
+  - get: message
+    trigger: true
+  - task: check
+    image: ubuntu-focal
+    config:
+      platform: linux
+      inputs:
+      - name: message
+      run:
+        path: cat
+        args:
+        - message/coscup-2021.log

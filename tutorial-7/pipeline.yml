@@ -3,7 +3,7 @@ resources:
   - name: concourse-demo
     type: git
     source:
-      uri: https://github.com/fourdollars/concourse-demo.git
+      uri: https://github.com/fourdollars/concourse-demo
       branch: coscup
   - name: resource-image
     type: docker-image
