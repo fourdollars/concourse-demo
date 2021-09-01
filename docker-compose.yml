@@ -50,6 +50,7 @@ services:
       CONCOURSE_TSA_HOST: web:2222
       CONCOURSE_TSA_PUBLIC_KEY: /concourse-keys/web/tsa_host_key.pub
       CONCOURSE_TSA_WORKER_PRIVATE_KEY: /concourse-keys/worker/worker_key
+      CONCOURSE_GARDEN_DNS_PROXY_ENABLE: "true"
 
   # see https://concourse-ci.org/vault-credential-manager.html
   vault:
